@@ -21,11 +21,11 @@ int start_connection(client_socket_t *server_info) {
     return connect(server_info->socket_descriptor, (struct sockaddr *) &server, sizeof(server));
 }
 
-int send_message(client_socket_t *server_info, char *message, size_t message_size) {
+int send_message(client_socket_t *server_info, message_t *message, size_t message_size) {
     return send(server_info->socket_descriptor , message, message_size, 0);
 }
 
-int fetch_message(client_socket_t *server_info, char *message, size_t message_size) {
+int fetch_message(client_socket_t *server_info, message_t *message, size_t message_size) {
     return recv(server_info->socket_descriptor, message, message_size, 0);
 }
 

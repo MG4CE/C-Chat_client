@@ -61,7 +61,7 @@ command_t * parse_commands(char *line) {
 }
 
 void parse_username(char *command_line, char *username){
-    //add pre size check for username
+    //TODO add pre size check for username
     int can_parse = 0;
     int username_index = 0;
     for (int i = 0; i < strlen(command_line); i++){
