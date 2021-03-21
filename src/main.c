@@ -12,6 +12,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <errno.h>
+#include "../include/interface.h"
+#include "../lib/socket_client/socket_client.h"
 
 int main (int argc, char **argv) {
     int debug = 0;
@@ -19,6 +22,8 @@ int main (int argc, char **argv) {
     char *host = NULL;
     int index;
     int c;
+    int username[22];
+    client_socket_t connection_info;
 
     //---------------------------- Parse Args ----------------------------
     opterr = 0;
@@ -50,11 +55,27 @@ int main (int argc, char **argv) {
         printf ("Non-option argument %s\n", argv[index]);
     }
 
-    //----------------------- Client Socket Setup -----------------------
+    while(1){
+        get_username(username, USERNAME_LEN);
+        if (username[USERNAME_LEN - 1] != '\0'){
+            puts("Username length exceeded please try again!");
+        } else {
+            break;
+        }
+    }
 
-    //-------------------- Client Connect to Server ---------------------
+    //-------------------- Create / Connect Socket --------------------
+    connection_info.hostname = host;
+    if (create_socket(&connection_info) == -1){
+        fprintf (stderr, "ERROR: %c\n", errno);
+        exit(EXIT_FAILURE);
+    }
 
-    //--------------------- Start Client Interface ----------------------
+    if (start_connection(&connection_info)== -1){
+        fprintf (stderr, "ERROR: %c\n", errno);
+        exit(EXIT_FAILURE);
+    }
+
 
     return 0;
 }
