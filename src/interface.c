@@ -3,11 +3,11 @@
 void print_help(){
     puts("/help 				- shows available commands");
     puts("/list 				- return all connected users and thier status");
-    puts("/public 			- connect to public chat");
-    puts("/private <username> 		- sends private message to user");
-    puts("/private-session <username> 	- request to start private session with user");
-    puts("/accept 			- accept private session request");
-    puts("/decline 			- decline private session request");
+    //puts("/public 			- connect to public chat");
+    puts("/pm <username> 		        - sends private message to user");
+    //puts("/private-session <username> 	- request to start private session with user");
+    //puts("/accept 			- accept private session request");
+    //puts("/decline 			- decline private session request");
     puts("/leave 				- leave current session");
     puts("/exit 				- disconnect and exit");
 }
@@ -36,22 +36,10 @@ command_t * parse_commands(char *line) {
         command->command = HELP;
     } else if (strcmp(line, "/list")){
         command->command = LIST;
-    } else if (strcmp(line, "/public")){
-        command->command = PUBLIC;
     } else if (strstr(line, "/private ")){
         command->command = PRIVATE;
         parse_username(line, selected_username);
         command->selected_user = selected_username;
-    } else if (strstr(line, "/private-session ") != NULL){
-        command->command = PRIVATE_SESSION;
-        parse_username(line, selected_username);
-        command->selected_user = selected_username;
-    } else if (strcmp(line, "/accept")){
-        command->command = ACCEPT;
-    } else if (strcmp(line, "/decline")){
-        command->command = DECLINE;
-    } else if (strcmp(line, "/leave")){
-        command->command = LEAVE;
     } else if (strcmp(line, "/exit")){
         command->command = EXIT;
     } else {

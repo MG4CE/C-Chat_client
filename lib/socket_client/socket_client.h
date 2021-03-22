@@ -17,7 +17,6 @@ typedef enum {
     GET_USERS,
     SEND_PUBLIC,
     SEND_PRIVATE,
-    REQUEST_SESSION,
     LEAVE,
     DISCONNECT,
     ERROR,

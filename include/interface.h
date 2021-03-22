@@ -16,11 +16,7 @@ typedef struct command{
 typedef enum{
     HELP,
     LIST,
-    PUBLIC,
     PRIVATE,
-    PRIVATE_SESSION,
-    ACCEPT,
-    DECLINE,
     LEAVE,
     EXIT,
     INVALID_COMMAND,
@@ -34,5 +30,4 @@ command_t * parse_commands(char *line);
 void parse_username(char *command_line, char *username);
 void remove_spaces(char* s);
 void remove_spaces_end(char* s);
-
 #endif
