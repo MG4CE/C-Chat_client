@@ -8,11 +8,6 @@
 #define COMMAND_PREFIX "/"
 #define USERNAME_LEN 22
 
-typedef struct command{
-    commands command;
-    char *selected_user;
-}command_t;
-
 typedef enum{
     HELP,
     LIST,
@@ -21,6 +16,11 @@ typedef enum{
     EXIT,
     INVALID_COMMAND,
 }commands;
+
+typedef struct command{
+    commands command;
+    char *selected_user;
+}command_t;
 
 void print_help();
 void clear_window();

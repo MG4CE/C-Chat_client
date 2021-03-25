@@ -1,4 +1,4 @@
-#include "socket_client.h"
+#include "../include/socket_client.h"
 
 int create_socket(client_socket_t *server_info) {
     if (resolve_hostname(server_info->hostname, server_info->server_ip) == -1){

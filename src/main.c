@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include "../include/interface.h"
-#include "../lib/socket_client/socket_client.h"
+#include "../include/socket_client.h"
 
 #define MAXEVENT_FDS 2
 
@@ -76,6 +76,7 @@ int main (int argc, char **argv) {
         ready_fds = event_fds;
 
         if (select(MAXEVENT_FDS, &ready_fds, NULL, NULL, NULL) < 0) {
+            close_connection(connection_info);
             exit_errno(connection_info);
         }
 
@@ -90,7 +91,6 @@ int main (int argc, char **argv) {
 
     close_connection(connection_info);
     free(connection_info);
-
     return EXIT_SUCCESS;
 }
 

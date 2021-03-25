@@ -83,7 +83,7 @@ void remove_spaces_end(char* s) {
         if (s[i] != ' ' && s[i] != '\0'){
             break;
         } else if (s[i] == ' ') {
-            s[i] = '/0';
+            s[i] = 0;
         }
     }
 }
