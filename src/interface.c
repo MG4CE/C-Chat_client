@@ -29,25 +29,6 @@ void trim_newline(char *line){
     }
 }
 
-command_t * parse_commands(char *line) {
-    command_t * command = malloc(sizeof(command_t));
-    char selected_username[USERNAME_LEN];
-    if (strcmp(line, "/help")) {
-        command->command = HELP;
-    } else if (strcmp(line, "/list")){
-        command->command = LIST;
-    } else if (strstr(line, "/private ")){
-        command->command = PRIVATE;
-        parse_username(line, selected_username);
-        command->selected_user = selected_username;
-    } else if (strcmp(line, "/exit")){
-        command->command = EXIT;
-    } else {
-        command->command = INVALID_COMMAND;
-    }
-    return command;
-}
-
 void parse_username(char *command_line, char *username){
     //TODO add pre size check for username
     int can_parse = 0;
@@ -60,7 +41,7 @@ void parse_username(char *command_line, char *username){
             break;
         }
         if (can_parse){
-            if (username_index < USERNAME_LEN - 2){
+            if (username_index < INPUT_USER_LEN - 2){
                 username[username_index] = command_line[i];
                 username_index++;
             }

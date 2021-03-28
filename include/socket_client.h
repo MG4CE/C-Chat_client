@@ -8,9 +8,9 @@
 #include<netdb.h>
 
 #define IPV4 AF_INET
-#define TCP SOCK_STREAM
-#define UDP SOCK_DGRAM
-#define IP_PROTOCOL 0
+#define IP_PROTO 0
+#define MAX_MESSAGE_LEN 3950
+#define USERNAME_LEN 21
 
 typedef enum {
     SET_USERNAME,
@@ -30,8 +30,8 @@ typedef struct {
 
 typedef struct message {
     request command;
-    char * message;
-    char * selected_user;
+    char message[MAX_MESSAGE_LEN];
+    char username[USERNAME_LEN];
 }message_t;
 
 int create_socket(client_socket_t *server_info);

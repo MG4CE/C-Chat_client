@@ -4,7 +4,7 @@ int create_socket(client_socket_t *server_info) {
     if (resolve_hostname(server_info->hostname, server_info->server_ip) == -1){
         return -1;
     }
-    int socket_desc = socket(IPV4, TCP, IP_PROTOCOL);
+    int socket_desc = socket(IPV4, SOCK_STREAM, IP_PROTO);
     if(socket_desc == -1){
         return -1;
     }
