@@ -1,20 +1,24 @@
 #include "../include/socket_client.h"
 
 int create_socket(client_socket_t *server_info) {
-    if (resolve_hostname(server_info->hostname, server_info->server_ip) == -1){
+    if (resolve_hostname(server_info->hostname, server_info->server_ip) == -1) {
         return -1;
     }
+
     int socket_desc = socket(IPV4, SOCK_STREAM, IP_PROTO);
     if(socket_desc == -1){
         return -1;
     }
+    
+    server_info->socket_descriptor = socket_desc;
+
     return 0;
 }
 
 int start_connection(client_socket_t *server_info) {
     struct sockaddr_in server;
 
-    server.sin_addr.s_addr = inet_addr(server_info->server_ip); //inet_addr converts string addr to unsigned long
+    inet_pton(IPV4, server_info->server_ip, &server.sin_addr);
     server.sin_port = htons(server_info->port); //Host TO Network Short
     server.sin_family = IPV4;
 

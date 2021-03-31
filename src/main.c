@@ -7,9 +7,8 @@
 #include "../include/socket_client.h"
 
 #define MAXEVENT_FDS 2
-#define MAX_MESSAGE_LEN 3950
 
-//TODO add timeout function as sperate thread
+//TODO add timeout function
 
 void exit_errno(client_socket_t *connection_info);
 void exit_error(client_socket_t *connection_info, char *message);
@@ -56,19 +55,20 @@ int main (int argc, char **argv) {
         printf ("Non-option argument %s\n", argv[index]);
     }
 
-    input_username(username);
-
     connect_to_server(connection_info, host, port);
+
+    input_username(username);
 
     set_username(connection_info, username);
 
     fd_set event_fds, ready_fds;
+
     FD_ZERO(&event_fds);
     FD_SET(connection_info->socket_descriptor, &event_fds);
     FD_SET(STDIN_FILENO, &event_fds);
     fflush(stdin);
 
-    while (1){
+    while (1) {
         ready_fds = event_fds;
 
         if (select(MAXEVENT_FDS, &ready_fds, NULL, NULL, NULL) < 0) {
@@ -91,7 +91,7 @@ int main (int argc, char **argv) {
 }
 
 void exit_errno(client_socket_t *connection_info){
-    fprintf (stderr, "ERROR: %c\n", errno);
+    fprintf (stderr, "ERROR: %s\n", strerror(errno));
     close_connection(connection_info);
     free(connection_info);
     exit(EXIT_FAILURE);
@@ -108,13 +108,14 @@ void connect_to_server(client_socket_t *connection_info, char *host, int port){
     connection_info->hostname = host;
     connection_info->port = port;
 
-    if (create_socket(connection_info) == -1){
+    if (create_socket(connection_info) == -1) {
         exit_errno(connection_info);
     }
 
-    if (start_connection(connection_info)== -1){
+    if (start_connection(connection_info) == -1) {
         exit_error(connection_info, "Unable to connect to server!");
     }
+    
     puts("Connected!");
 }
 
@@ -132,7 +133,7 @@ void input_username(char *username){
 void set_username(client_socket_t *connection_info, char *username){
     message_t *set_username = malloc(sizeof(message_t));
     set_username->command = SET_USERNAME;
-    strcpy(set_username->message, username);
+    strcpy(set_username->username, username);
 
     if (send_message(connection_info, set_username, sizeof(message_t)) == -1) {
         exit_errno(connection_info);

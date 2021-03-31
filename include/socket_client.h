@@ -4,6 +4,7 @@
 #include<sys/socket.h>
 #include<string.h>
 #include<arpa/inet.h>
+#include<sys/select.h>
 #include<unistd.h>
 #include<netdb.h>
 
@@ -12,11 +13,12 @@
 #define MAX_MESSAGE_LEN 3950
 #define USERNAME_LEN 21
 
-typedef enum {
+typedef enum{
     SET_USERNAME,
     GET_USERS,
     SEND_PUBLIC,
     SEND_PRIVATE,
+    SUCCESS,
     DISCONNECT,
     ERROR,
 }request;
