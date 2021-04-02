@@ -1,15 +1,15 @@
 #include "../include/interface.h"
 
-void print_help(){
-    puts("/help 				- shows available commands");
+void print_help() {
+    puts("\n/help 				- shows available commands");
     puts("/list 				- return all connected users and thier status");
     //puts("/public 			- connect to public chat");
     puts("/pm <username> 		        - sends private message to user");
     //puts("/private-session <username> 	- request to start private session with user");
     //puts("/accept 			- accept private session request");
     //puts("/decline 			- decline private session request");
-    puts("/leave 				- leave current session");
-    puts("/exit 				- disconnect and exit");
+    //puts("/leave 				- leave current session");
+    puts("/exit 				- disconnect and exit\n");
 }
 
 void clear(){
@@ -29,7 +29,7 @@ void trim_newline(char *line) {
     }
 }
 
-void parse_username(char *command_line, char *username) {
+void parse_username(char *command_line, char *username)  {
     //TODO add pre size check for username
     int can_parse = 0;
     int username_index = 0;
@@ -66,5 +66,27 @@ void remove_spaces_end(char* s) {
         } else if (s[i] == ' ') {
             s[i] = 0;
         }
+    }
+}
+
+void print_message(message_t *message) {
+     switch (message->command) {
+        case SEND_PUBLIC:
+            printf("%s: %s\n", message->username, message->message);
+            break;
+        case SEND_PRIVATE:
+            printf("%s -> You: %s\n", message->username, message->message);
+            break;
+        case GET_USERS:
+            printf("Connected Users: %s\n", message->message);
+            break;
+        case ERROR:
+            printf("ERROR: %s\n", message->message);
+            break;
+        case DISCONNECT:
+            printf("%s has disconnected.\n", message->username);
+        default:
+            puts("Unknown command received, message ignored!");
+            break;
     }
 }

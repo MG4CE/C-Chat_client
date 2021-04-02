@@ -34,4 +34,4 @@ $(BIN_DIR) $(OBJ_DIR):
 clean:
 	@$(RM) -rv $(BIN_DIR) $(OBJ_DIR)
 
--include $(OBJ:.o=.d)
+-include $(OBJ:.o=.d

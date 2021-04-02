@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "socket_client.h"
 
 #define COMMAND_PREFIX "/"
 #define INPUT_USER_LEN 22
@@ -15,4 +16,5 @@ void parse_username(char *command_line, char *username);
 void trim_newline(char *line);
 void remove_spaces(char* s);
 void remove_spaces_end(char* s);
+void print_message(message_t *message);
 #endif

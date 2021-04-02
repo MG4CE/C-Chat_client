@@ -20,78 +20,6 @@ void process_user_command(client_socket_t *connection_info, char *line);
 void process_server_message(client_socket_t *connection_info);
 void process_user_input(client_socket_t *connection_info);
 
-int main (int argc, char **argv) {
-    char *host = NULL;
-    int port = 0;
-    int index;
-    int c;
-    char username[USERNAME_LEN];
-    client_socket_t *connection_info = malloc(sizeof(client_socket_t));
-
-    opterr = 0;
-
-    while ((c = getopt (argc, argv, "p:h:")) != -1) {
-        switch (c) {
-            case 'd':
-                break;
-            case 'p':
-                port = atoi(optarg);
-                break;
-            case 'h':
-                host = optarg;
-                break;
-            case '?':
-                if (optopt == 'p' || optopt == 'h') {
-                    fprintf (stderr, "Option -%c requires an argument.\n", optopt);
-                } else if (isprint (optopt)) {
-                    fprintf (stderr, "Unknown option `-%c'.\n", optopt);
-                }
-                return 1;
-            default:
-                abort ();
-        }
-    } 
-
-    for (index = optind; index < argc; index++) {
-        printf ("Non-option argument %s\n", argv[index]);
-    }
-
-    connect_to_server(connection_info, host, port);
-
-    input_username(username);
-
-    set_username(connection_info, username);
-
-    struct pollfd fds[MAXEVENT_FDS];
-
-    fds[1].fd = connection_info->socket_descriptor;
-    fds->events = POLLIN;
-
-    fds[0].fd = STDIN_FILENO;
-    fds->events = POLLIN;
-
-    while (1) {
-        int ret = poll(fds, MAXEVENT_FDS, -1);
-
-        if (ret == -1) {
-            exit_errno(connection_info);
-        }
-
-        if (fds[0].revents & POLLIN) {
-            process_user_input(connection_info);
-        }
-        
-        if (fds[1].revents & POLLIN) {
-            process_server_message(connection_info);
-        }
-
-    }   
-
-    close_connection(connection_info);
-    free(connection_info);
-    return EXIT_SUCCESS;
-}
-
 void exit_errno(client_socket_t *connection_info){
     fprintf (stderr, "ERROR: %s\n", strerror(errno));
     close_connection(connection_info);
@@ -216,17 +144,82 @@ void process_server_message(client_socket_t *connection_info) {
         exit_errno(connection_info);
     }
 
-    if (message->command == SEND_PUBLIC) {
-        printf("%s: %s\n", message->username, message->message);
-    } else if (message->command == SEND_PRIVATE) {
-        printf("%s -> You: %s\n", message->username, message->message);
-    } else if (message->command == GET_USERS) {
-        printf("Connected Users: %s\n", message->message);
-    } else if (message->command == ERROR) {
-        printf("ERROR: %s\n", message->message);
-    } else {
-        puts("Unknown command received, message ignored!");
-    }
+    print_message(message);
 
     free(message);
+}
+
+int main (int argc, char **argv) {
+    char *host = NULL;
+    int port = 0;
+    int index;
+    int c;
+    char username[USERNAME_LEN];
+    client_socket_t *connection_info = malloc(sizeof(client_socket_t));
+
+    opterr = 0;
+
+    while ((c = getopt (argc, argv, "p:h:")) != -1) {
+        switch (c) {
+            case 'd':
+                break;
+            case 'p':
+                port = atoi(optarg);
+                break;
+            case 'h':
+                host = optarg;
+                break;
+            case '?':
+                if (optopt == 'p' || optopt == 'h') {
+                    fprintf (stderr, "Option -%c requires an argument.\n", optopt);
+                } else if (isprint (optopt)) {
+                    fprintf (stderr, "Unknown option `-%c'.\n", optopt);
+                }
+                return 1;
+            default:
+                abort ();
+        }
+    } 
+
+    for (index = optind; index < argc; index++) {
+        printf ("Non-option argument %s\n", argv[index]);
+    }
+
+    connect_to_server(connection_info, host, port);
+
+    input_username(username);
+
+    set_username(connection_info, username);
+
+    struct pollfd fds[MAXEVENT_FDS];
+
+    fds[1].fd = connection_info->socket_descriptor;
+    fds->events = POLLIN;
+
+    fds[0].fd = STDIN_FILENO;
+    fds->events = POLLIN;
+
+    while (1) {
+        int ret = poll(fds, MAXEVENT_FDS, -1);
+        if (ret == -1) {
+            exit_errno(connection_info);
+        }
+
+        if (!ret) {
+            puts("Connection Timeout!");
+            break;
+        }
+
+        if (fds[0].revents & POLLIN) {
+            process_user_input(connection_info);
+        }
+        
+        if (fds[1].revents & POLLIN) {
+            process_server_message(connection_info);
+        }
+    }   
+
+    close_connection(connection_info);
+    free(connection_info);
+    return EXIT_SUCCESS;
 }
