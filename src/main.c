@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
+#include <poll.h>
 #include "../include/interface.h"
 #include "../include/socket_client.h"
 
@@ -61,29 +62,30 @@ int main (int argc, char **argv) {
 
     set_username(connection_info, username);
 
-    fd_set event_fds, ready_fds;
+    struct pollfd fds[MAXEVENT_FDS];
 
-    FD_ZERO(&event_fds);
-    FD_SET(connection_info->socket_descriptor, &event_fds);
-    FD_SET(STDIN_FILENO, &event_fds);
-    fflush(stdin);
+    fds[1].fd = connection_info->socket_descriptor;
+    fds->events = POLLIN;
+
+    fds[0].fd = STDIN_FILENO;
+    fds->events = POLLIN;
 
     while (1) {
-        ready_fds = event_fds;
+        int ret = poll(fds, MAXEVENT_FDS, -1);
 
-        if (select(MAXEVENT_FDS, &ready_fds, NULL, NULL, NULL) < 0) {
-            close_connection(connection_info);
+        if (ret == -1) {
             exit_errno(connection_info);
         }
 
-        if (FD_ISSET(connection_info->socket_descriptor, &ready_fds)) {
+        if (fds[0].revents & POLLIN) {
+            process_user_input(connection_info);
+        }
+        
+        if (fds[1].revents & POLLIN) {
             process_server_message(connection_info);
         }
 
-        if (FD_ISSET(STDIN_FILENO, &ready_fds)) {
-            process_user_input(connection_info);
-        }
-    }
+    }   
 
     close_connection(connection_info);
     free(connection_info);
@@ -158,6 +160,9 @@ void process_user_input(client_socket_t *connection_info) {
         return;
     }
 
+    trim_newline(str);
+    remove_spaces_end(str);
+
     if (str[0] == '/'){
         process_user_command(connection_info, str);
         return;
@@ -167,37 +172,36 @@ void process_user_input(client_socket_t *connection_info) {
     public_message.command = SEND_PUBLIC;
     strcpy(public_message.message, str);
 
-    if (send_message(connection_info, &public_message, sizeof(message_t))){
+    if (send_message(connection_info, &public_message, sizeof(message_t)) == -1){
         exit_errno(connection_info);
     }
 }
 
 void process_user_command(client_socket_t *connection_info, char *line) {
-    if (strcmp(line, "/help")) {
+    if (strcmp(line, "/help") == 0) {
         print_help();
         return;
     } 
 
     message_t *message = malloc(sizeof(message_t));
 
-    if (strcmp(line, "/list")){
+    if (strcmp(line, "/list") == 0){
         message->command = GET_USERS;
-        if (send_message(connection_info, message, sizeof(message_t))){
+        if (send_message(connection_info, message, sizeof(message_t)) == -1){
             exit_errno(connection_info);
         }
-    } else if (strstr(line, "/private ")){
+    } else if (strstr(line, "/pm ") != NULL){
+        //current no op
         char selected_username[USERNAME_LEN];
         parse_username(line, selected_username);
         message->command = SEND_PRIVATE;
         strcpy(message->username, selected_username);
-        if (send_message(connection_info, message, sizeof(message_t))){
+        if (send_message(connection_info, message, sizeof(message_t)) == -1){
             exit_errno(connection_info);
         }
-    } else if (strcmp(line, "/exit")){
-        message->command = DISCONNECT;
-        if (send_message(connection_info, message, sizeof(message_t))){
-            exit_errno(connection_info);
-        }
+    } else if (strcmp(line, "/exit") == 0){
+        close_connection(connection_info);
+        exit(EXIT_SUCCESS);
     } else {
         puts("Unknown command, use /help for list of commands");
     }
@@ -208,18 +212,18 @@ void process_user_command(client_socket_t *connection_info, char *line) {
 void process_server_message(client_socket_t *connection_info) {
     message_t *message = malloc(sizeof(message_t));
 
-    if (fetch_message(connection_info, message, sizeof(message_t))){
+    if (fetch_message(connection_info, message, sizeof(message_t)) == -1){
         exit_errno(connection_info);
     }
 
     if (message->command == SEND_PUBLIC) {
-        printf("%s: %s", message->username, message->message);
+        printf("%s: %s\n", message->username, message->message);
     } else if (message->command == SEND_PRIVATE) {
-        printf("%s -> You: %s", message->username, message->message);
+        printf("%s -> You: %s\n", message->username, message->message);
     } else if (message->command == GET_USERS) {
-        printf("Connected Users: %s", message->message);
+        printf("Connected Users: %s\n", message->message);
     } else if (message->command == ERROR) {
-        printf("ERROR: %s", message->message);
+        printf("ERROR: %s\n", message->message);
     } else {
         puts("Unknown command received, message ignored!");
     }

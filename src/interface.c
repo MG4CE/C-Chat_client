@@ -16,20 +16,20 @@ void clear(){
     system("clear");
 }
 
-void get_username(char *username, size_t max_len){
+void get_username(char *username, size_t max_len) {
     printf("Please enter your username:");
     fgets(username, max_len, stdin);
     trim_newline(username);
 }
 
-void trim_newline(char *line){
+void trim_newline(char *line) {
     int index = strlen(line) - 1;
     if (line[index] == '\n') {
         line[index] = '\0';
     }
 }
 
-void parse_username(char *command_line, char *username){
+void parse_username(char *command_line, char *username) {
     //TODO add pre size check for username
     int can_parse = 0;
     int username_index = 0;

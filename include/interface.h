@@ -11,8 +11,8 @@
 void print_help();
 void clear_window();
 void get_username(char *username, size_t max_len);
-void trim_newline(char *line);
 void parse_username(char *command_line, char *username);
+void trim_newline(char *line);
 void remove_spaces(char* s);
 void remove_spaces_end(char* s);
 #endif

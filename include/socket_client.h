@@ -1,12 +1,11 @@
 #ifndef SOCKET_CLIENT_H
 #define SOCKET_CLIENT_H
-#include<stdio.h>
-#include<sys/socket.h>
-#include<string.h>
-#include<arpa/inet.h>
-#include<sys/select.h>
-#include<unistd.h>
-#include<netdb.h>
+#include <stdio.h>
+#include <sys/socket.h>
+#include <string.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <netdb.h>
 
 #define IPV4 AF_INET
 #define IP_PROTO 0
